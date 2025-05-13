@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stake UI Clone</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: none;
+    }
+    .btn {
+      background: #00f7ff;
+      padding: 10px;
+      color: black;
+      font-weight: bold;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Username Verification</h2>
+    <input type="text" placeholder="Enter username" id="username" />
+    <p>BSC Address:</p>
+    <p style="color: #00ff99;">0x65bf6f6795e14a270e964e6110fc74d74287f132</p>
+    <p>Network: BSC</p>
+    <button class="btn" onclick="verify()">Verify Username</button>
+    <p id="status"></p>
+  </div>
+  <script>
+    function verify() {
+      const status = document.getElementById("status");
+      status.innerHTML = "Verifying...";
+      setTimeout(() => {
+        status.innerHTML = "Verified!";
+        status.style.color = "#00ff99";
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
