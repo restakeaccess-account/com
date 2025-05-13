@@ -264,6 +264,12 @@
         });
 
         // Handle OK button in popup
-       
+        okBtn.addEventListener('click', () => {
+            popup.style.display = 'none';  // Hide the popup
+            container.classList.remove('blur');  // Remove background blur
+            window.location.reload();  // Refresh the page
+        });
+    </script>
 
-        
+</body>
+</html>
