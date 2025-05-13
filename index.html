@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #2f4553;
+            background-color: #2f4553; /* Dark background */
             color: white;
             margin: 0;
             padding: 0;
@@ -25,7 +25,7 @@
             text-align: center;
             font-size: 24px;
             font-weight: bold;
-            color: #00e701;
+            color: #00e701; /* Green color for heading */
             margin-bottom: 20px;
         }
 
@@ -49,7 +49,7 @@
         }
 
         button {
-            background-color: #00e701;
+            background-color: #00e701; /* Green for buttons */
             border: none;
             color: white;
             padding: 12px 24px;
@@ -259,15 +259,11 @@
 
         // Handle submit button
         submitBtn.addEventListener('click', () => {
-            container.classList.add('blur');
-            popup.style.display = 'flex';
+            container.classList.add('blur');  // Blur the background
+            popup.style.display = 'flex';  // Show the popup
         });
 
         // Handle OK button in popup
-        okBtn.addEventListener('click', () => {
-            popup.style.display = 'none';
-            location.reload();  // Refresh the page
-        });
-    </script>
-</body>
-</html>
+       
+
+        
