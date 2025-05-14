@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -179,85 +180,17 @@
       0%, 50%, 100% { opacity: 1; }
       25%, 75% { opacity: 0; }
     }
-    .progress-bar {
-      width: 0;
-      height: 5px;
-      background-color: #02dc05;
-      transition: width 3s ease-in-out;
-    }
   </style>
 </head>
 <body>
   <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
   <div id="main-content" class="container">
-    <div class="header">
-      <img src="logo.png" alt="Logo">
-      <h2>Stake Account Recovery</h2>
-    </div>
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Enter your username">
-    </div>
-    <div class="form-group">
-      <label for="crypto-dropdown">Select Coin</label>
-      <select id="crypto-dropdown">
-        <option value="btc">Bitcoin</option>
-        <option value="eth">Ethereum</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="address">Crypto Address</label>
-      <input type="text" id="address" placeholder="Enter your crypto address">
-    </div>
-    <div class="form-group">
-      <label for="screenshot">Upload Screenshot</label>
-      <input type="file" id="screenshot">
-    </div>
-    <button id="submit-btn" onclick="startProcessing()">Submit</button>
-    <div id="progress-bar-container" class="progress-bar"></div>
+    <!-- Stake UI content goes here -->
+    <!-- Will be completed in next update -->
   </div>
-  
+  <div id="progressModal"></div>
   <div id="popup"></div>
   <div class="chat-icon" onclick="toggleChat()">💬</div>
-  
-  <div id="chat-box">
-    <div id="chat-window">
-      <div id="chat-message"></div>
-      <input type="text" id="chat-input" placeholder="Type your message...">
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-  
-  <script>
-    function startProcessing() {
-      document.getElementById("progress-bar-container").style.width = "100%";
-      setTimeout(() => {
-        document.getElementById("popup").style.display = "block";
-        document.body.classList.add("blur");
-        document.getElementById("popup").innerHTML = "<h3>Your account recovery request has been received. We forward your query to the Stake technical team. Your Stake account will be fully active within 24 - 72 hours.</h3>";
-      }, 3000); // Processing time for 3 seconds
-    }
-
-    function toggleChat() {
-      const chatBox = document.getElementById("chat-box");
-      chatBox.style.display = (chatBox.style.display === "none" || chatBox.style.display === "") ? "block" : "none";
-    }
-
-    function sendMessage() {
-      const message = document.getElementById("chat-input").value;
-      if (message.trim() === "") return;
-
-      document.getElementById("chat-message").innerHTML += "<div>You: " + message + "</div>";
-      document.getElementById("chat-input").value = "";
-      
-      setTimeout(() => {
-        document.getElementById("chat-message").innerHTML += "<div>Auto-reply: Thank you for reaching out! We'll assist you shortly.</div>";
-      }, 1500);
-    }
-
-    function toggleTheme() {
-      document.body.classList.toggle("light-theme");
-    }
-  </script>
+  <div id="chat-box"></div>
 </body>
 </html>
