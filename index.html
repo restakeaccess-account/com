@@ -13,7 +13,6 @@
       box-sizing: border-box;
       font-family: 'Poppins', sans-serif;
     }
-
     body {
       background: radial-gradient(circle at top left, #1a2a3b, #0f212e);
       color: #ffffff;
@@ -25,12 +24,10 @@
       padding: 20px;
       transition: background 0.3s, color 0.3s;
     }
-
     .light-theme {
       background: #f0f0f0;
       color: #111;
     }
-
     .container {
       background: rgba(47, 69, 83, 0.9);
       backdrop-filter: blur(8px);
@@ -43,38 +40,31 @@
       z-index: 1;
       transition: background 0.3s;
     }
-
     .light-theme .container {
       background: #fff;
       color: #000;
     }
-
     .header {
       text-align: center;
       margin-bottom: 25px;
     }
-
     .header img {
       width: 120px;
       margin-bottom: 10px;
     }
-
     .header h2 {
       color: #02dc05;
       font-size: 1.8rem;
       font-weight: 600;
     }
-
     .form-group {
       margin-bottom: 15px;
     }
-
     label {
       font-weight: 500;
       margin-bottom: 6px;
       display: block;
     }
-
     input, select {
       width: 100%;
       padding: 10px;
@@ -85,18 +75,15 @@
       font-size: 0.95rem;
       transition: border 0.3s;
     }
-
     .light-theme input,
     .light-theme select {
       background: #e5e5e5;
       color: #111;
     }
-
     input:focus, select:focus {
       border: 2px solid #02dc05;
       outline: none;
     }
-
     button {
       width: 100%;
       padding: 12px;
@@ -109,33 +96,27 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
-
     button:hover {
       box-shadow: 0 0 10px #02dc05, 0 0 20px #02dc05;
     }
-
     .copy-btn, .save-btn {
       margin-top: 10px;
       background-color: #166ae0;
       color: #fff;
     }
-
     .message {
       font-size: 0.9rem;
       color: #00ff9d;
       margin-top: 8px;
     }
-
     #qr-code-container {
       text-align: center;
       margin-top: 15px;
     }
-
     #qr {
       margin: 10px auto;
     }
-
-    #popup, #chat-box {
+    #popup, #progressModal, #chat-box {
       display: none;
       position: fixed;
       top: 50%;
@@ -147,17 +128,15 @@
       border-radius: 14px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
       z-index: 9999;
-      animation: fadeInGlow 0.6s ease;
+      animation: fadeIn 0.4s ease;
       max-width: 90%;
       text-align: center;
     }
-
     .blur {
       filter: blur(5px);
       pointer-events: none;
       user-select: none;
     }
-
     .theme-toggle {
       position: fixed;
       top: 20px;
@@ -170,7 +149,6 @@
       font-size: 1.2rem;
       cursor: pointer;
     }
-
     .chat-icon {
       position: fixed;
       bottom: 20px;
@@ -182,57 +160,36 @@
       cursor: pointer;
       z-index: 999;
     }
-
-    @keyframes fadeInGlow {
-      from {
-        opacity: 0;
-        transform: scale(0.95) translate(-50%, -50%);
-        box-shadow: none;
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translate(-50%, -50%);
-        box-shadow: 0 0 20px #02dc05, 0 0 30px #02dc05;
-      }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95) translate(-50%, -50%); }
+      to { opacity: 1; transform: scale(1) translate(-50%, -50%); }
     }
-
-    #countdown {
-      margin-top: 20px;
-      background: #0f212e;
-      border-radius: 10px;
-      overflow: hidden;
-      width: 100%;
-      height: 20px;
+    .glow {
+      animation: glowEffect 1.5s ease-in-out infinite alternate;
     }
-
-    #progress-bar {
-      height: 100%;
-      width: 0%;
-      background-color: #02dc05;
-      transition: width 5s linear;
+    @keyframes glowEffect {
+      from { box-shadow: 0 0 10px #02dc05; }
+      to { box-shadow: 0 0 25px #02dc05; }
+    }
+    .typing::after {
+      content: '|';
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 50%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0; }
     }
   </style>
 </head>
 <body>
-<!-- Page content stays the same until script section -->
-<script>
-  function submitForm() {
-    document.getElementById('main-content').classList.add('blur');
-    const popup = document.getElementById('popup');
-    popup.innerHTML = '<h3>Processing Your Request...</h3><div id="countdown"><div id="progress-bar"></div></div>';
-    popup.style.display = 'block';
-
-    setTimeout(() => {
-      document.getElementById('progress-bar').style.width = '100%';
-    }, 100);
-
-    setTimeout(() => {
-      popup.innerHTML = `
-        <p>Recovery request received. Stake technical team will review and reactivate your account within 24–72 hrs.</p>
-        <button onclick="location.reload()">OK</button>
-      `;
-    }, 5200);
-  }
-</script>
+  <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+  <div id="main-content" class="container">
+    <!-- Stake UI content goes here -->
+    <!-- Will be completed in next update -->
+  </div>
+  <div id="progressModal"></div>
+  <div id="popup"></div>
+  <div class="chat-icon" onclick="toggleChat()">💬</div>
+  <div id="chat-box"></div>
 </body>
 </html>
