@@ -260,6 +260,61 @@
       from { opacity: 0; transform: scale(0.95) translate(-50%, -50%); }
       to { opacity: 1; transform: scale(1) translate(-50%, -50%); }
     }
+    /* कस्टम ड्रॉपदाउन स्टाइल्स */
+    .custom-select {
+      position: relative;
+      width: 100%;
+    }
+    .selected-coin {
+      padding: 10px;
+      background: #11232f;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+    }
+    .light-theme .selected-coin {
+      background: #e5e5e5;
+      color: #111;
+    }
+    .selected-coin:hover, .selected-coin:focus {
+      border: 2px solid #02dc05;
+    }
+    .coin-options {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: #11232f;
+      border-radius: 8px;
+      list-style: none;
+      z-index: 10;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .light-theme .coin-options {
+      background: #e5e5e5;
+    }
+    .coin-options li {
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      color: #fff;
+    }
+    .light-theme .coin-options li {
+      color: #111;
+    }
+    .coin-options li img {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+    }
+    .coin-options li:hover {
+      background: #02dc05;
+      color: #0f212e;
+    }
   </style>
 </head>
 <body>
@@ -281,18 +336,21 @@
 
     <div class="form-group">
       <label for="coin" data-i18n="select-coin">Select Coin</label>
-      <select id="coin" onchange="updateNetworkOptions(); updateAddress()">
-        <option value="" data-i18n="select-coin-option">--Select Coin--</option>
-        <option value="usdt">USDT</option>
-        <option value="btc">BTC</option>
-        <option value="trx">TRX</option>
-        <option value="eth">Ethereum</option>
-        <option value="bnb">BNB</option>
-        <option value="sol">Solana</option>
-        <option value="ada">Cardano</option>
-        <option value="doge">dogecoin</option>
-        <option value="shib">SHIBAINU</option>
-      </select>
+      <div class="custom-select">
+        <div class="selected-coin" data-i18n="select-coin-option">--Select Coin--</div>
+        <ul class="coin-options">
+          <li data-value="usdt"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/16%401/icon/usdt.png" alt="USDT"> USDT</li>
+          <li data-value="btc"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/16%401/icon/btc.png" alt="BTC"> BTC</li>
+          <li data-value="trx"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/16%401/icon/trx.png" alt="TRX"> TRX</li>
+          <li data-value="eth"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/16%401/icon/eth.png" alt="ETH"> Ethereum</li>
+          <li data-value="bnb"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/16%401/icon/bnb.png" alt="BNB"> BNB</li>
+          <li data-value="sol"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/16%401/icon/sol.png" alt="SOL"> Solana</li>
+          <li data-value="ada"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/16%401/icon/ada.png" alt="ADA"> Cardano</li>
+          <li data-value="doge"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/16%401/icon/doge.png" alt="DOGE"> Dogecoin</li>
+          <li data-value="shib"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/16%401/icon/shib.png" alt="SHIB"> SHIBAINU</li>
+        </ul>
+        <input type="hidden" id="coin" name="coin">
+      </div>
     </div>
 
     <div class="form-group">
@@ -648,6 +706,28 @@
         chatBox.scrollTop = chatBox.scrollHeight;
       }
     }
+
+    // कस्टम ड्रॉपदाउन हैंडलिंग
+    document.querySelector('.selected-coin').addEventListener('click', () => {
+      const options = document.querySelector('.coin-options');
+      options.style.display = options.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.querySelectorAll('.coin-options li').forEach(option => {
+      option.addEventListener('click', () => {
+        document.querySelector('.selected-coin').innerText = option.innerText;
+        document.getElementById('coin').value = option.dataset.value;
+        document.querySelector('.coin-options').style.display = 'none';
+        updateNetworkOptions();
+        updateAddress();
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.custom-select')) {
+        document.querySelector('.coin-options').style.display = 'none';
+      }
+    });
 
     // Initialize
     translatePage();
